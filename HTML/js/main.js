@@ -343,14 +343,14 @@ function updateUI(flags, isForceUpdate = false) {
         // 有効なランタン、または初回・強制更新時のみ画像を更新
         if (isEnabled || isForceUpdate) {
             if (flag === 1) {
-                if (img) img.src = 'lanthan_on.svg';
+                if (img) img.src = 'WebLantern_on.svg';
                 if (badge) {
                     badge.innerText = '点灯 (1)';
                     badge.className = 'lantern-badge on';
                 }
                 if (card) card.classList.add('active');
             } else {
-                if (img) img.src = 'lanthan_off.svg';
+                if (img) img.src = 'WebLantern_off.svg';
                 if (badge) {
                     badge.innerText = '消灯 (0)';
                     badge.className = 'lantern-badge';
@@ -483,7 +483,7 @@ function rebuildPiPWindow() {
             gridHtml += `
                 <div class="pip-item" id="pip-card-${i}">
                     <div>#${i}</div>
-                    <img id="pip-img-${i}" class="pip-img" src="lanthan_off.svg" alt="L${i}">
+                    <img id="pip-img-${i}" class="pip-img" src="WebLantern_off.svg" alt="L${i}">
                     <div id="pip-txt-${i}">消灯</div>
                 </div>
             `;
@@ -518,12 +518,12 @@ function updatePiPUI(flags) {
 
         if (img && txt) {
             if (flag === 1) {
-                img.src = 'lanthan_on.svg';
+                img.src = 'WebLantern_on.svg';
                 txt.innerText = '点灯';
                 txt.style.color = '#FF9F43';
                 if (card) card.classList.add('active');
             } else {
-                img.src = 'lanthan_off.svg';
+                img.src = 'WebLantern_off.svg';
                 txt.innerText = '消灯';
                 txt.style.color = '#5A6E85';
                 if (card) card.classList.remove('active');

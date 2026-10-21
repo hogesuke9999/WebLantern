@@ -16,23 +16,21 @@
 ```text
 / (ルートディレクトり)
 ├── CNF/
-│   └── config.php          # 共通設定ファイル
+│   └── config.php         # 共通設定ファイル
 ├── DB/
-│   └── WEBLAMP.db          # SQLite データベースファイル
-├── HTML/
-│   ├── index.html          # 一般ユーザー用メイン画面・PiP制御 [source: 19]
-│   ├── admin_4.html        # 管理者専用ポータル画面 [source: 18]
-│   ├── verify.php          # パスワード設定・再設定処理 [source: 17]
-│   ├── api.php             # バックエンドAPI・認証・ビジネスロジック [source: 22]
-│   ├── lanthan_on.svg      # ランタン点灯表示用アイコン [source: 21]
-│   └── lanthan_off.svg     # ランタン消灯表示用アイコン [source: 20]
-└── CRON/
-    └── check_disconnect.php# クライアント死活監視用定期実行スクリプト [source: 23]
+│   └── WebLantern.db      # SQLite データベースファイル
+└── HTML/
+    ├── index.html          # 一般ユーザー用メイン画面・PiP制御 [source: 19]
+    ├── admin.html          # 管理者専用ポータル画面 [source: 18]
+    ├── verify.php          # パスワード設定・再設定処理 [source: 17]
+    ├── api.php             # バックエンドAPI・認証・ビジネスロジック [source: 22]
+    ├── WebLantern_on.svg   # ランタン点灯表示用アイコン [source: 21]
+    └── WebLantern_off.svg  # ランタン消灯表示用アイコン [source: 20]
 ```
 
 ## 3. データベース設計 (SQLite3)
 
-使用データベース: `WEBLAMP.db`
+使用データベース: `WebLantern.db`
 
 ### 3.1 `users` テーブル（ユーザー管理）
 

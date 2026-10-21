@@ -18,7 +18,7 @@ if (!defined('BASE_DIR')) {
     define('BASE_DIR', $baseDir);
 }
 if (!defined('DB_PATH')) {
-    define('DB_PATH', BASE_DIR . '/DB/WEBLAMP.db');
+    define('DB_PATH', BASE_DIR . '/DB/WebLantern.db');
 }
 
 if (!file_exists(DB_PATH)) {

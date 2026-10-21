@@ -2,7 +2,7 @@
 // CNF/config.php - システム全体設定ファイル
 
 // 1. システムの基本URL設定（環境に合わせて変更してください）
-define('BASE_URL', 'https://sample.com/WEBLAMP/');
+define('BASE_URL', 'https://sample.com/WebLantern/');
 
 // config.php（/CNF）の1つ上の階層を基底ディレクトリとして自動取得
 define('BASE_DIR', dirname(__DIR__));
@@ -12,8 +12,8 @@ define('CNF_DIR',  BASE_DIR . '/CNF');
 define('DB_DIR',   BASE_DIR . '/DB');
 define('HTML_DIR', BASE_DIR . '/HTML');
 
-// データベースパスの設定（起点ディレクトリ/DB/WEBLAMP.db）
-define('DB_PATH',  DB_DIR . '/weblanthan.db');
+// データベースパスの設定（起点ディレクトリ/DB/WebLantern.db）
+define('DB_PATH',  DB_DIR . '/WebLantern.db');
 
 // メール送信用設定
 define('MAIL_FROM_EMAIL', 'noreply@sample.com');
