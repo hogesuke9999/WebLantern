@@ -829,38 +829,7 @@ switch ($action) {
 
         $clientId = $_GET['client_id'] ?? ($_SERVER['HTTP_X_CLIENT_ID'] ?? 'session_' . session_id());
 
-        // 管理者によってセッションが強制削除（キック）されたかチェック
-        $checkSessionStmt = $pdo->prepare("
-            SELECT COUNT(*) as count 
-            FROM active_sessions 
-            WHERE user_id = :user_id AND client_id = :client_id
-        ");
-        $checkSessionStmt->execute([
-            ':user_id' => $_SESSION['user_id'],
-            ':client_id' => $clientId
-        ]);
-
-        if ((int)$checkSessionStmt->fetch()['count'] === 0) {
-            // セッション情報をクリアして401を返却
-            $_SESSION = [];
-            if (ini_get("session.use_cookies")) {
-                $params = session_get_cookie_params();
-                setcookie(session_name(), '', time() - 42000,
-                    $params["path"], $params["domain"],
-                    $params["secure"], $params["httponly"]
-                );
-            }
-            session_destroy();
-
-            http_response_code(401);
-            echo json_encode([
-                'success' => false,
-                'session_cleared' => true,
-                'message' => 'セッションが管理者により切断されました。再ログインしてください。'
-            ]);
-            exit;
-        }
-
+        // ユーザー情報の取得
         $stmt = $pdo->prepare("SELECT user_id, username, flag1, flag2, flag3, flag4, enable1, enable2, enable3, enable4, api_key FROM users WHERE user_id = :user_id");
         $stmt->execute([':user_id' => $_SESSION['user_id']]);
         $user = $stmt->fetch();
@@ -872,12 +841,12 @@ switch ($action) {
             exit;
         }
 
+        // クライアントごとのハートビート更新（未登録時は自動生成・登録）
+        updateClientHeartbeat($pdo, $user['user_id'], $clientId);
+
         $now = time();
         $stmt = $pdo->prepare("UPDATE users SET last_access = :now WHERE user_id = :user_id");
         $stmt->execute([':now' => $now, ':user_id' => $_SESSION['user_id']]);
-
-        // クライアントごとのハートビート更新
-        updateClientHeartbeat($pdo, $user['user_id'], $clientId);
 
         echo json_encode([
             'success' => true,
