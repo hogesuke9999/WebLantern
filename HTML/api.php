@@ -358,7 +358,7 @@ switch ($action) {
         $stmt = $pdo->prepare("
             SELECT id, user_id, username, api_key, flag1, flag2, flag3, flag4, enable1, enable2, enable3, enable4, status, is_admin 
             FROM users 
-            WHERE is_admin = 0 AND user_id != 'admin'
+            WHERE is_admin = 0
             ORDER BY id ASC
         ");
         $stmt->execute();
@@ -366,8 +366,10 @@ switch ($action) {
 
         $now = time();
         $timeoutSeconds = 60; // 60秒以内のハートビートでアクティブ判定
+        $currentAdminUserId = $_SESSION['user_id'] ?? '';
+        $currentSessionClientId = $_GET['client_id'] ?? ($_SERVER['HTTP_X_CLIENT_ID'] ?? 'session_' . session_id());
 
-        $formattedUsers = array_map(function($u) use ($pdo, $now, $timeoutSeconds) {
+        $formattedUsers = array_map(function($u) use ($pdo, $now, $timeoutSeconds, $currentAdminUserId, $currentSessionClientId) {
             // 各ユーザーのアクティブセッションを取得
             $sStmt = $pdo->prepare("
                 SELECT client_id, ip_address, user_agent, last_heartbeat 
@@ -380,6 +382,10 @@ switch ($action) {
 
             $activeClients = [];
             foreach ($sessions as $s) {
+                if ($u['user_id'] === $currentAdminUserId || $s['client_id'] === $currentSessionClientId) {
+                    continue;
+                }
+
                 $isAlive = ($now - (int)$s['last_heartbeat']) <= $timeoutSeconds;
                 $activeClients[] = [
                     'client_id' => $s['client_id'],
