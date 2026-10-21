@@ -137,7 +137,7 @@ function verifyCsrfToken() {
  * クライアント個別のハートビート（死活状態）を記録・更新する関数
  */
 function updateClientHeartbeat($pdo, $userId, $clientId) {
-    if (empty($userId) || empty($clientId)) return;
+    if (empty($userId) || empty($clientId) || strpos($clientId, 'session_') === 0) return;
 
     $now = time();
 
@@ -367,7 +367,7 @@ switch ($action) {
         $now = time();
         $timeoutSeconds = 60; // 60秒以内のハートビートでアクティブ判定
         $currentAdminUserId = $_SESSION['user_id'] ?? '';
-        $currentSessionClientId = $_GET['client_id'] ?? ($_SERVER['HTTP_X_CLIENT_ID'] ?? 'session_' . session_id());
+        $currentSessionClientId = $_GET['client_id'] ?? ($_SERVER['HTTP_X_CLIENT_ID'] ?? '');
 
         $formattedUsers = array_map(function($u) use ($pdo, $now, $timeoutSeconds, $currentAdminUserId, $currentSessionClientId) {
             // 各ユーザーのアクティブセッションを取得
@@ -382,7 +382,7 @@ switch ($action) {
 
             $activeClients = [];
             foreach ($sessions as $s) {
-                if ($u['user_id'] === $currentAdminUserId || $s['client_id'] === $currentSessionClientId) {
+                if (!empty($currentSessionClientId) && $s['client_id'] === $currentSessionClientId) {
                     continue;
                 }
 
@@ -806,8 +806,10 @@ switch ($action) {
         $stmt->execute([':now' => time(), ':id' => $user['id']]);
 
         // クライアントごとのアクティブセッション（死活監視）を更新
-        $clientId = $input['client_id'] ?? ($_GET['client_id'] ?? ($_SERVER['HTTP_X_CLIENT_ID'] ?? 'session_' . session_id()));
-        updateClientHeartbeat($pdo, $user['user_id'], $clientId);
+        $clientId = $input['client_id'] ?? ($_GET['client_id'] ?? ($_SERVER['HTTP_X_CLIENT_ID'] ?? ''));
+        if (!empty($clientId)) {
+            updateClientHeartbeat($pdo, $user['user_id'], $clientId);
+        }
 
         echo json_encode([
             'success' => true,
@@ -827,9 +829,8 @@ switch ($action) {
             exit;
         }
 
-        $clientId = $_GET['client_id'] ?? ($_SERVER['HTTP_X_CLIENT_ID'] ?? 'session_' . session_id());
+        $clientId = $_GET['client_id'] ?? ($_SERVER['HTTP_X_CLIENT_ID'] ?? '');
 
-        // ユーザー情報の取得
         $stmt = $pdo->prepare("SELECT user_id, username, flag1, flag2, flag3, flag4, enable1, enable2, enable3, enable4, api_key FROM users WHERE user_id = :user_id");
         $stmt->execute([':user_id' => $_SESSION['user_id']]);
         $user = $stmt->fetch();
@@ -841,8 +842,10 @@ switch ($action) {
             exit;
         }
 
-        // クライアントごとのハートビート更新（未登録時は自動生成・登録）
-        updateClientHeartbeat($pdo, $user['user_id'], $clientId);
+        // クライアントごとのハートビート更新
+        if (!empty($clientId)) {
+            updateClientHeartbeat($pdo, $user['user_id'], $clientId);
+        }
 
         $now = time();
         $stmt = $pdo->prepare("UPDATE users SET last_access = :now WHERE user_id = :user_id");
