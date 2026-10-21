@@ -281,7 +281,7 @@ switch ($action) {
     
     // 管理者アカウントが存在するか確認
     case 'admin_check':
-        $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM users WHERE user_id = 'admin' OR is_admin = 1");
+        $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM users WHERE is_admin = 1");
         $stmt->execute();
         $row = $stmt->fetch();
         
@@ -290,7 +290,7 @@ switch ($action) {
 
     // 初回管理者作成（仮登録＆メール送信）
     case 'admin_register':
-        $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM users WHERE user_id = 'admin' OR is_admin = 1");
+        $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM users WHERE is_admin = 1");
         $stmt->execute();
         if ($stmt->fetch()['count'] > 0) {
             http_response_code(400);
@@ -314,9 +314,10 @@ switch ($action) {
         // 管理者は初期状態ですべて無効(enable=0)、消灯(flag=0)
         $stmt = $pdo->prepare("
             INSERT INTO users (user_id, username, api_key, verify_token, token_expires, status, is_admin, flag1, flag2, flag3, flag4, enable1, enable2, enable3, enable4)
-            VALUES ('admin', :username, :api_key, :token, :expires, 'pending', 1, 0, 0, 0, 0, 0, 0, 0, 0)
+            VALUES (:email, :username, :api_key, :token, :expires, 'pending', 1, 0, 0, 0, 0, 0, 0, 0, 0)
         ");
         $stmt->execute([
+            ':email' => $email,
             ':username' => $username,
             ':api_key' => $apiKey,
             ':token' => $token,
