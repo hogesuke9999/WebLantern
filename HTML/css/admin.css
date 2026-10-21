@@ -1,0 +1,186 @@
+* { box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0; padding: 20px;
+    background-color: #F0F8FF;
+    color: #1C2A3A;
+}
+.container { max-width: 1400px; margin: 0 auto; }
+.card {
+    background: #FFFFFF;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 40, 80, 0.08);
+    border: 1px solid #D0E3F0;
+    margin-bottom: 20px;
+}
+
+table { width: 100%; border-collapse: collapse; text-align: left; }
+th, td { padding: 12px; border-bottom: 1px solid #E1EDF5; font-size: 0.9rem; vertical-align: middle; }
+th { background: #F4F8FB; color: #5A6E85; font-weight: 600; }
+
+/* ==========================================================================
+   ランタン表示コントロールエリア (横4つ並び確定レイアウト)
+   ========================================================================== */
+
+/* 4つのカードを強制的・確実に横一列に並べるコンテナ */
+.lantern-card-group {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    align-items: center !important;
+    white-space: nowrap !important;
+    width: max-content !important;
+}
+
+/* 個々のランタン枠（カード）：上段・下段のボタンを縦並びにする */
+.lantern-card {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    padding: 6px !important;
+    border: 1px solid #D0E1F9 !important;
+    border-radius: 8px !important;
+    background-color: #FBFDFF !important;
+    width: 86px !important;
+    min-width: 86px !important;
+    box-sizing: border-box !important;
+}
+
+/* 無効化（🔕 無効）状態のカード外枠 */
+.lantern-card.is-disabled {
+    border-color: #E2E8F0 !important;
+    background-color: #F8FAFC !important;
+}
+
+/* 上段：有効 / 無効 ボタン base */
+.btn-lantern-enable {
+    width: 100% !important;
+    padding: 4px 0 !important;
+    border-radius: 5px !important;
+    font-size: 0.75rem !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    border: 1px solid transparent !important;
+    cursor: pointer !important;
+    transition: all 0.2s !important;
+    white-space: nowrap !important;
+    display: block !important;
+}
+
+/* 🔔 有効（青色） */
+.btn-lantern-enable.active {
+    background-color: #1E88E5 !important;
+    color: #FFFFFF !important;
+    border-color: #1E88E5 !important;
+}
+
+/* 🔕 無効（グレー） */
+.btn-lantern-enable.disabled {
+    background-color: #E9ECEF !important;
+    color: #6C757D !important;
+    border: 1px solid #CED4DA !important;
+}
+
+/* 下段：点灯 / 消灯 ボタン base */
+.btn-lantern-toggle {
+    width: 100% !important;
+    padding: 4px 0 !important;
+    border-radius: 5px !important;
+    font-size: 0.75rem !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    border: 1px solid transparent !important;
+    cursor: pointer !important;
+    transition: all 0.2s !important;
+    white-space: nowrap !important;
+    display: block !important;
+}
+
+/* 点灯（オレンジ） */
+.btn-lantern-toggle.on {
+    background-color: #FF9800 !important;
+    color: #FFFFFF !important;
+    border-color: #E0832B !important;
+}
+
+/* 消灯（ダークグレー） */
+.btn-lantern-toggle.off {
+    background-color: #546E7A !important;
+    color: #FFFFFF !important;
+    border-color: #455A64 !important;
+}
+
+/* 無効時の下段ボタン（グレーアウト・操作不可） */
+.btn-lantern-toggle.is-disabled {
+    background-color: #ECEFF1 !important;
+    color: #B0BEC5 !important;
+    border: 1px solid #CFD8DC !important;
+    cursor: not-allowed !important;
+    opacity: 0.7 !important;
+}
+
+/* ==========================================================================
+   APIキーコピー・cURLコピーボタン
+   ========================================================================== */
+
+.btn-copy-apikey,
+.btn-copy-curl {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    width: 100%;
+    text-align: center;
+}
+
+/* 📋 キーをコピー */
+.btn-copy-apikey {
+    border: 1px solid #1E88E5;
+    background-color: #FFFFFF;
+    color: #1E88E5;
+}
+
+.btn-copy-apikey:hover {
+    background-color: #E3F2FD;
+}
+
+.btn-copy-apikey.copied {
+    border-color: #2EA44F;
+    background-color: #2EA44F;
+    color: #FFFFFF;
+}
+
+/* 📜 cURL例 */
+.btn-copy-curl {
+    border: 1px solid #6c757d;
+    background-color: #FFFFFF;
+    color: #495057;
+}
+
+.btn-copy-curl:hover {
+    background-color: #E9ECEF;
+}
+
+.btn-copy-curl.copied {
+    border-color: #2EA44F;
+    background-color: #2EA44F;
+    color: #FFFFFF;
+}
+
+/* ==========================================================================
+   クライアントバッジ・その他UIパーツ
+   ========================================================================== */
+
+.client-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin: 2px;
+}
+.client-badge.alive { background-color: #2EA44F; color: white; }
+.client-badge.dead { background-color: #CB2431; color: white; }

@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="100%" height="100%">
+  <defs>
+    <!-- 背景の光グラデーション -->
+    <radialGradient id="ambientGlow" cx="50%" cy="55%" r="45%">
+      <stop offset="0%" stop-color="#ffae19" stop-opacity="0.6"/>
+      <stop offset="50%" stop-color="#ff7b00" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#1a1c29" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- ホヤ（ガラス）内部の発光グラデーション -->
+    <radialGradient id="glassGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="25%" stop-color="#ffea78"/>
+      <stop offset="60%" stop-color="#ff9d00" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#e65c00" stop-opacity="0.9"/>
+    </radialGradient>
+
+    <!-- 金属パーツのハイライト（金属質感） -->
+    <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2d3748"/>
+      <stop offset="25%" stop-color="#4a5568"/>
+      <stop offset="50%" stop-color="#1a202c"/>
+      <stop offset="75%" stop-color="#718096"/>
+      <stop offset="100%" stop-color="#1a202c"/>
+    </linearGradient>
+
+    <!-- 炎のグラデーション -->
+    <linearGradient id="flameGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#ff3300"/>
+      <stop offset="50%" stop-color="#ff9900"/>
+      <stop offset="100%" stop-color="#ffffcc"/>
+    </linearGradient>
+
+    <!-- ドロップシドウフィルター -->
+    <filter id="glowEffect" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- ダークな背景（光を目立たせるため） -->
+  <rect width="100%" height="100%" fill="#12131C"/>
+
+  <!-- 全体の周囲の光 -->
+  <circle cx="200" cy="270" r="180" fill="url(#ambientGlow)"/>
+
+  <!-- 吊り下げリング・フック -->
+  <path d="M 200,40 A 25,25 0 1,0 200,90 A 25,25 0 1,0 200,40 Z" fill="none" stroke="url(#metalGrad)" stroke-width="8"/>
+  <rect x="190" y="85" width="20" height="15" rx="3" fill="url(#metalGrad)"/>
+
+  <!-- 持ち手（ハンドル） -->
+  <path d="M 120,240 C 120,110 280,110 280,240" fill="none" stroke="url(#metalGrad)" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- 笠（トップカバー） -->
+  <path d="M 160,100 L 240,100 L 250,125 L 150,125 Z" fill="url(#metalGrad)"/>
+  <path d="M 130,125 Q 200,110 270,125 L 290,165 Q 200,150 110,165 Z" fill="url(#metalGrad)"/>
+
+  <!-- ガラス（ホヤ）の発光と本体 -->
+  <path d="M 135,165 Q 200,158 265,165 L 250,310 Q 200,325 150,310 Z" fill="url(#glassGlow)" filter="url(#glowEffect)"/>
+
+  <!-- 炎（芯） -->
+  <path d="M 200,280 C 185,270 185,240 200,220 C 215,240 215,270 200,280 Z" fill="url(#flameGrad)" filter="url(#glowEffect)"/>
+  <ellipse cx="200" cy="280" rx="15" ry="5" fill="#e65c00"/>
+
+  <!-- サイドフレーム（支柱） -->
+  <!-- 左フレーム -->
+  <path d="M 135,160 C 100,200 100,280 145,315" fill="none" stroke="url(#metalGrad)" stroke-width="10" stroke-linecap="round"/>
+  <!-- 右フレーム -->
+  <path d="M 265,160 C 300,200 300,280 255,315" fill="none" stroke="url(#metalGrad)" stroke-width="10" stroke-linecap="round"/>
+
+  <!-- 土台（ベース） -->
+  <path d="M 145,310 L 255,310 L 265,335 L 135,335 Z" fill="url(#metalGrad)"/>
+  <rect x="125" y="335" width="150" height="25" rx="5" fill="url(#metalGrad)"/>
+  <rect x="140" y="360" width="120" height="15" rx="3" fill="url(#metalGrad)"/>
+
+  <!-- 光の反射（ガラスのハイライト） -->
+  <path d="M 148,180 Q 140,230 155,295" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+  <path d="M 252,180 Q 256,210 250,240" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+</svg>

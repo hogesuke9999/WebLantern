@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebLamp 管理</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="p-4">
+
+    <div class="container" style="max-width: 1400px;">
+
+        <!-- 管理者 仮登録エリア（初期状態: 非表示） -->
+        <div id="admin-register-card" class="card p-4 mb-4" style="display: none;">
+            <h4 class="mb-3">管理者 アカウント初期登録</h4>
+            <div id="reg-msg"></div>
+            <div class="mb-3">
+                <label class="form-label">管理者 氏名</label>
+                <input type="text" id="reg-admin-name" class="form-control" placeholder="管理者 太郎">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">メールアドレス</label>
+                <input type="email" id="reg-admin-email" class="form-control" placeholder="admin@example.com">
+            </div>
+            <button type="button" class="btn btn-primary" onclick="adminRegister()">仮登録メールを送信</button>
+        </div>
+
+        <!-- 管理者 ログインエリア（初期状態: 非表示） -->
+        <div id="admin-login-card" class="card p-4 mb-4" style="display: none;">
+            <h4 class="mb-3">管理者 ログイン</h4>
+            <div id="login-msg" class="text-danger mb-2"></div>
+            <div class="mb-3">
+                <label class="form-label">ユーザーID / メールアドレス</label>
+                <input type="text" id="admin-id" class="form-control" value="admin">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">パスワード</label>
+                <input type="password" id="admin-pass" class="form-control">
+            </div>
+            <button type="button" class="btn btn-success" onclick="adminLogin()">ログイン</button>
+        </div>
+
+        <!-- 管理者 ダッシュボード（初期状態: 非表示） -->
+        <div id="admin-dashboard" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-primary" id="downloadAllLogsBtn">全体ログCSV出力</button>
+                </div>
+                <button type="button" class="btn btn-secondary" id="logoutBtn">ログアウト</button>
+            </div>
+
+            <!-- ユーザー管理テーブル -->
+            <div class="card">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title mb-0">ユーザー一覧およびランタン制御</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col" class="ps-3" style="width: 50px;">ID</th>
+                                    <th scope="col" style="min-width: 160px;">氏名 / ユーザーID</th>
+                                    <th scope="col" style="width: 100px;">APIキー</th>
+                                    <th scope="col" style="min-width: 180px;">アクティブ端末</th>
+                                    <th scope="col" style="min-width: 390px;">ランタン有効/点灯設定 (1〜4)</th>
+                                    <th scope="col" style="width: 100px;">ログ出力</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userTableBody">
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-muted">データを読み込み中...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- スクリプト参照 -->
+    <script src="js/admin.js"></script>
+</body>
+</html>

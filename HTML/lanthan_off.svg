@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="100%" height="100%">
+  <defs>
+    <!-- 消灯時のホヤ（ガラス）グラデーション -->
+    <radialGradient id="glassOff" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2d3748" stop-opacity="0.8"/>
+      <stop offset="70%" stop-color="#1a202c" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.95"/>
+    </radialGradient>
+
+    <!-- ダークシルバー金属パーツ（グラデーション） -->
+    <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2d3748"/>
+      <stop offset="25%" stop-color="#4a5568"/>
+      <stop offset="50%" stop-color="#1a202c"/>
+      <stop offset="75%" stop-color="#718096"/>
+      <stop offset="100%" stop-color="#1a202c"/>
+    </linearGradient>
+
+    <!-- 立ち上る煙のグラデーション -->
+    <linearGradient id="smokeGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#cbd5e1" stop-opacity="0.6"/>
+      <stop offset="50%" stop-color="#94a3b8" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#64748b" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- 煙ぼかし用フィルター -->
+    <filter id="smokeBlur" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" />
+    </filter>
+  </defs>
+
+  <!-- 暗い背景（元の画像に合わせたダークネイビー） -->
+  <rect width="100%" height="100%" fill="#12131C"/>
+
+  <!-- 吊り下げリング・フック -->
+  <path d="M 200,40 A 25,25 0 1,0 200,90 A 25,25 0 1,0 200,40 Z" fill="none" stroke="url(#metalGrad)" stroke-width="8"/>
+  <rect x="190" y="85" width="20" height="15" rx="3" fill="url(#metalGrad)"/>
+
+  <!-- 持ち手（ハンドル） -->
+  <path d="M 120,240 C 120,110 280,110 280,240" fill="none" stroke="url(#metalGrad)" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- 笠（トップカバー） -->
+  <path d="M 160,100 L 240,100 L 250,125 L 150,125 Z" fill="url(#metalGrad)"/>
+  <path d="M 130,125 Q 200,110 270,125 L 290,165 Q 200,150 110,165 Z" fill="url(#metalGrad)"/>
+
+  <!-- 消灯したガラス（ホヤ） -->
+  <path d="M 135,165 Q 200,158 265,165 L 250,310 Q 200,325 150,310 Z" fill="url(#glassOff)"/>
+
+  <!-- 消えた芯（黒く焦げた状態） -->
+  <rect x="197" y="275" width="6" height="10" rx="1" fill="#090a0f"/>
+  <!-- 消えた直後の赤い余熱（かすかな光） -->
+  <ellipse cx="200" cy="275" rx="2" ry="1" fill="#ef4444" opacity="0.8"/>
+
+  <!-- 立ち上る細い煙 -->
+  <path d="M 200,273 C 193,250 207,230 197,200 C 190,170 205,150 198,120" fill="none" stroke="url(#smokeGrad)" stroke-width="5" stroke-linecap="round" filter="url(#smokeBlur)"/>
+  <path d="M 200,273 C 204,255 196,235 203,210" fill="none" stroke="url(#smokeGrad)" stroke-width="3" stroke-linecap="round" filter="url(#smokeBlur)"/>
+
+  <!-- サイドフレーム（支柱） -->
+  <!-- 左フレーム -->
+  <path d="M 135,160 C 100,200 100,280 145,315" fill="none" stroke="url(#metalGrad)" stroke-width="10" stroke-linecap="round"/>
+  <!-- 右フレーム -->
+  <path d="M 265,160 C 300,200 300,280 255,315" fill="none" stroke="url(#metalGrad)" stroke-width="10" stroke-linecap="round"/>
+
+  <!-- 土台（ベース） -->
+  <path d="M 145,310 L 255,310 L 265,335 L 135,335 Z" fill="url(#metalGrad)"/>
+  <rect x="125" y="335" width="150" height="25" rx="5" fill="url(#metalGrad)"/>
+  <rect x="140" y="360" width="120" height="15" rx="3" fill="url(#metalGrad)"/>
+
+  <!-- 光の反射（ガラス表面のハイライト） -->
+  <path d="M 148,180 Q 140,230 155,295" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+  <path d="M 252,180 Q 256,210 250,240" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.2"/>
+</svg>
