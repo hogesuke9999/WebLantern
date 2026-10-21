@@ -73,7 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isValidToken) {
     } else {
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
-        $prefix = ($user['user_id'] === 'admin') ? 'admin_key_' : 'key_';
+        // 【修正】is_admin フラグをもとに API キーのプレフィックスを判定
+        $prefix = ((int)($user['is_admin'] ?? 0) === 1) ? 'admin_key_' : 'key_';
         $newApiKey = $prefix . bin2hex(random_bytes(16));
 
         $updateStmt = $pdo->prepare("
