@@ -32,6 +32,26 @@ function getEffectiveBaseUrl() {
     return getFallbackBaseUrl();
 }
 
+// 認証モードの切り替え（ログイン / 仮登録）
+function switchAuthMode(mode) {
+    const regCard = document.getElementById('admin-register-card');
+    const loginCard = document.getElementById('admin-login-card');
+    const btnLogin = document.getElementById('btn-show-login');
+    const btnRegister = document.getElementById('btn-show-register');
+
+    if (mode === 'register') {
+        if (regCard) regCard.style.display = 'block';
+        if (loginCard) loginCard.style.display = 'none';
+        if (btnRegister) btnRegister.classList.add('active');
+        if (btnLogin) btnLogin.classList.remove('active');
+    } else {
+        if (regCard) regCard.style.display = 'none';
+        if (loginCard) loginCard.style.display = 'block';
+        if (btnLogin) btnLogin.classList.add('active');
+        if (btnRegister) btnRegister.classList.remove('active');
+    }
+}
+
 // 管理者ログイン状態およびアカウント存在状態の確認
 async function checkAdminStatus() {
     try {
@@ -50,23 +70,14 @@ async function checkAdminStatus() {
             }
         }
 
-        const checkRes = await fetch('api.php?action=admin_check');
-        const checkData = await checkRes.json();
-        
         const dashboard = document.getElementById('admin-dashboard');
         if (dashboard) dashboard.style.display = 'none';
         stopAdminPolling();
 
-        const regCard = document.getElementById('admin-register-card');
-        const loginCard = document.getElementById('admin-login-card');
+        const authNav = document.getElementById('admin-auth-nav');
+        if (authNav) authNav.style.display = 'block';
 
-        if (checkData.exists) {
-            if (regCard) regCard.style.display = 'none';
-            if (loginCard) loginCard.style.display = 'block';
-        } else {
-            if (regCard) regCard.style.display = 'block';
-            if (loginCard) loginCard.style.display = 'none';
-        }
+        switchAuthMode('login');
     } catch (e) {
         console.error('初期確認エラー:', e);
     }
@@ -135,10 +146,12 @@ async function adminLogin() {
 }
 
 async function showDashboard() {
+    const authNav = document.getElementById('admin-auth-nav');
     const regCard = document.getElementById('admin-register-card');
     const loginCard = document.getElementById('admin-login-card');
     const dashboard = document.getElementById('admin-dashboard');
 
+    if (authNav) authNav.style.display = 'none';
     if (regCard) regCard.style.display = 'none';
     if (loginCard) loginCard.style.display = 'none';
     if (dashboard) dashboard.style.display = 'block';
@@ -171,6 +184,12 @@ async function loadUsers() {
         const data = await res.json();
         if (data.success) {
             if (data.base_url) configBaseUrl = data.base_url;
+
+            // 管理者のユニークIDをヘッダーに表示
+            if (data.admin_info && data.admin_info.user_id) {
+                const adminIdSpan = document.getElementById('display-admin-unique-id');
+                if (adminIdSpan) adminIdSpan.innerText = data.admin_info.user_id;
+            }
 
             const tbody = document.getElementById('userTableBody');
             if (!tbody) return;
@@ -319,7 +338,7 @@ async function copyCurlExample(btnElement, apiKey) {
         }, 1500);
     } catch (e) {
         const textarea = document.createElement('textarea');
-        textarea.value = curlCmd;
+        textarea.value = apiKey;
         document.body.appendChild(textarea);
         textarea.select();
         document.execCommand('copy');

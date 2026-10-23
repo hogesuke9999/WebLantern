@@ -64,6 +64,7 @@ function getDBConnection() {
                 username TEXT NOT NULL,
                 password_hash TEXT,
                 api_key TEXT UNIQUE,
+                parent_admin_id TEXT DEFAULT NULL,
                 flag1 INTEGER DEFAULT 0,
                 flag2 INTEGER DEFAULT 0,
                 flag3 INTEGER DEFAULT 0,
@@ -80,6 +81,19 @@ function getDBConnection() {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ");
+
+        // parent_admin_id カラムが存在しない場合に自動追加（既存DBの互換性確保）
+        $cols = $pdo->query("PRAGMA table_info(users)")->fetchAll();
+        $hasParentAdmin = false;
+        foreach ($cols as $col) {
+            if ($col['name'] === 'parent_admin_id') {
+                $hasParentAdmin = true;
+                break;
+            }
+        }
+        if (!$hasParentAdmin) {
+            $pdo->exec("ALTER TABLE users ADD COLUMN parent_admin_id TEXT DEFAULT NULL");
+        }
 
         // クライアントごとのアクティブセッション管理テーブル（死活監視用）
         $pdo->exec("
@@ -279,25 +293,17 @@ switch ($action) {
     // A. 管理者用API
     // ==================================================
     
-    // 管理者アカウントが存在するか確認
+    // 管理者アカウントが存在するか確認（常にtrueを返し、ログイン/仮登録を画面選択可能にする）
     case 'admin_check':
         $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM users WHERE is_admin = 1");
         $stmt->execute();
         $row = $stmt->fetch();
         
-        echo json_encode(['exists' => ($row['count'] > 0)]);
+        echo json_encode(['exists' => true, 'admin_count' => (int)$row['count']]);
         break;
 
-    // 初回管理者作成（仮登録＆メール送信）
+    // 管理者仮登録（複数管理者の作成を許可）
     case 'admin_register':
-        $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM users WHERE is_admin = 1");
-        $stmt->execute();
-        if ($stmt->fetch()['count'] > 0) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => '管理者アカウントは既に作成されています']);
-            exit;
-        }
-
         $username = trim($input['username'] ?? '');
         $email = trim($input['email'] ?? '');
 
@@ -305,6 +311,21 @@ switch ($action) {
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => '有効な氏名とメールアドレスを入力してください']);
             exit;
+        }
+
+        $stmt = $pdo->prepare("SELECT status FROM users WHERE user_id = :email");
+        $stmt->execute([':email' => $email]);
+        $existing = $stmt->fetch();
+
+        if ($existing) {
+            if ($existing['status'] === 'active') {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'このメールアドレスは既に登録されています']);
+                exit;
+            } else {
+                $stmt = $pdo->prepare("DELETE FROM users WHERE user_id = :email AND status = 'pending'");
+                $stmt->execute([':email' => $email]);
+            }
         }
 
         $token = bin2hex(random_bytes(32));
@@ -351,22 +372,29 @@ switch ($action) {
         ]);
         break;
 
-    // 管理者用：全ユーザーの一覧・ステータス・各クライアント接続状態の取得
+    // 管理者用：ログイン中の管理者に紐づくユーザーの一覧・ステータス・各クライアント接続状態の取得
     case 'admin_get_users':
         requireAdminRole();
 
+        $currentAdminUserId = $_SESSION['user_id'] ?? '';
+
+        // ログイン中の管理者アカウント情報（ユニークID等）を取得
+        $adminStmt = $pdo->prepare("SELECT user_id, username, api_key FROM users WHERE user_id = :admin_id");
+        $adminStmt->execute([':admin_id' => $currentAdminUserId]);
+        $adminInfo = $adminStmt->fetch();
+
+        // ログイン中の管理者に紐づく一般ユーザー（parent_admin_id が一致するもの、または未指定のもの）を取得
         $stmt = $pdo->prepare("
             SELECT id, user_id, username, api_key, flag1, flag2, flag3, flag4, enable1, enable2, enable3, enable4, status, is_admin 
             FROM users 
-            WHERE is_admin = 0
+            WHERE is_admin = 0 AND (parent_admin_id = :admin_id OR parent_admin_id IS NULL OR parent_admin_id = '')
             ORDER BY id ASC
         ");
-        $stmt->execute();
+        $stmt->execute([':admin_id' => $currentAdminUserId]);
         $users = $stmt->fetchAll();
 
         $now = time();
         $timeoutSeconds = 60; // 60秒以内のハートビートでアクティブ判定
-        $currentAdminUserId = $_SESSION['user_id'] ?? '';
         $currentSessionClientId = $_GET['client_id'] ?? ($_SERVER['HTTP_X_CLIENT_ID'] ?? '');
 
         $formattedUsers = array_map(function($u) use ($pdo, $now, $timeoutSeconds, $currentAdminUserId, $currentSessionClientId) {
@@ -421,6 +449,10 @@ switch ($action) {
 
         echo json_encode([
             'success' => true,
+            'admin_info' => [
+                'user_id' => $adminInfo['user_id'] ?? $currentAdminUserId,
+                'api_key' => $adminInfo['api_key'] ?? ''
+            ],
             'users' => $formattedUsers,
             'csrf_token' => $_SESSION['csrf_token'] ?? ''
         ]);
@@ -640,15 +672,30 @@ switch ($action) {
         ]);
         break;
 
-    // 一般ユーザー仮登録
+    // 一般ユーザー仮登録（管理者IDの紐づけ対応）
     case 'register':
         $username = trim($input['username'] ?? '');
         $email = trim($input['email'] ?? '');
+        $adminId = trim($input['admin_id'] ?? '');
 
         if (empty($username) || empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => '有効なユーザー名とメールアドレスを入力してください']);
             exit;
+        }
+
+        // 管理者IDが入力されている場合、実在する管理者アカウントか検証
+        $parentAdminUserId = null;
+        if (!empty($adminId)) {
+            $adminCheck = $pdo->prepare("SELECT user_id FROM users WHERE (user_id = :admin_id OR api_key = :admin_id) AND is_admin = 1 AND status = 'active'");
+            $adminCheck->execute([':admin_id' => $adminId]);
+            $validAdmin = $adminCheck->fetch();
+            if (!$validAdmin) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => '指定された管理者IDが存在しないか無効です']);
+                exit;
+            }
+            $parentAdminUserId = $validAdmin['user_id'];
         }
 
         $stmt = $pdo->prepare("SELECT status FROM users WHERE user_id = :email");
@@ -673,15 +720,16 @@ switch ($action) {
 
         // 新規一般ユーザーも初期状態ですべて無効(enable=0)、消灯(flag=0)
         $stmt = $pdo->prepare("
-            INSERT INTO users (user_id, username, api_key, verify_token, token_expires, status, flag1, flag2, flag3, flag4, enable1, enable2, enable3, enable4)
-            VALUES (:email, :username, :api_key, :token, :expires, 'pending', 0, 0, 0, 0, 0, 0, 0, 0)
+            INSERT INTO users (user_id, username, api_key, verify_token, token_expires, status, parent_admin_id, flag1, flag2, flag3, flag4, enable1, enable2, enable3, enable4)
+            VALUES (:email, :username, :api_key, :token, :expires, 'pending', :parent_admin_id, 0, 0, 0, 0, 0, 0, 0, 0)
         ");
         $stmt->execute([
             ':email' => $email,
             ':username' => $username,
             ':api_key' => $apiKey,
             ':token' => $token,
-            ':expires' => $expires
+            ':expires' => $expires,
+            ':parent_admin_id' => $parentAdminUserId
         ]);
 
         // メール本文の作成と送信（config.phpの設定値を反映）

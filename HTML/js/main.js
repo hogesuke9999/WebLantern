@@ -126,11 +126,12 @@ async function handleLogin(e) {
     }
 }
 
-// 新規仮登録処理
+// 新規仮登録処理（管理者ID紐づけ対応）
 async function handleRegister(e) {
     e.preventDefault();
     const usernameInput = document.getElementById('reg_username').value;
     const emailInput = document.getElementById('reg_email').value;
+    const adminIdInput = document.getElementById('reg_admin_id') ? document.getElementById('reg_admin_id').value : '';
     const resultDiv = document.getElementById('register-result');
 
     try {
@@ -140,7 +141,7 @@ async function handleRegister(e) {
                 'Content-Type': 'application/json',
                 'X-CSRF-Token': currentCsrfToken || ''
             },
-            body: JSON.stringify({ username: usernameInput, email: emailInput })
+            body: JSON.stringify({ username: usernameInput, email: emailInput, admin_id: adminIdInput })
         });
 
         const data = await res.json();
