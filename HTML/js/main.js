@@ -30,7 +30,7 @@ function getClientId() {
     return clientId;
 }
 
-// ボタンの有効/無効表示を更新する関数
+// ボタンの有効/無効表示を更新する関数（表示専用）
 function updateToggleButtonUI(target, isEnabled) {
     const btn = document.getElementById(`btn-toggle-${target}`);
     const icon = document.getElementById(`btn-icon-${target}`);
@@ -39,41 +39,22 @@ function updateToggleButtonUI(target, isEnabled) {
     if (!btn) return;
 
     if (isEnabled) {
-        btn.className = 'btn-toggle-icon'; // 有効（グラデーション/アクティブ風）
+        btn.className = 'btn-toggle-icon'; // 有効表示
         if (icon) icon.innerText = '🔔';
         if (text) text.innerText = '有効';
-        btn.title = 'クリックして無効化';
+        btn.title = '現在の状態: 有効';
     } else {
-        btn.className = 'btn-toggle-icon off'; // 無効（グレーアウト）
+        btn.className = 'btn-toggle-icon off'; // 無効表示（グレーアウト）
         if (icon) icon.innerText = '🔕';
         if (text) text.innerText = '無効';
-        btn.title = 'クリックして有効化';
+        btn.title = '現在の状態: 無効';
     }
 }
 
-// ユーザー自身によるランタンの有効/無効切り替え処理
+// ユーザー自身によるランタンの有効/無効切り替え処理（無効化）
 async function toggleLanternEnable(target) {
-    const currentEnable = activeLanterns[target - 1] ? 1 : 0;
-    const newEnable = currentEnable === 1 ? 0 : 1;
-
-    try {
-        const res = await fetch('api.php?action=user_set_enable', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': currentCsrfToken || ''
-            },
-            body: JSON.stringify({ target: target, enable: newEnable })
-        });
-        const data = await res.json();
-        if (data.success) {
-            await fetchStatus(false);
-        } else {
-            alert('設定変更に失敗しました: ' + (data.message || ''));
-        }
-    } catch (err) {
-        console.error('有効/無効切り替えエラー:', err);
-    }
+    // クライアント側からの有効化/無効化変更は機能しないよう無効化
+    return;
 }
 
 // フォーム切り替え制御
@@ -126,11 +107,12 @@ async function handleLogin(e) {
     }
 }
 
-// 新規仮登録処理
+// 新規仮登録処理（管理者ID紐づけ対応）
 async function handleRegister(e) {
     e.preventDefault();
     const usernameInput = document.getElementById('reg_username').value;
     const emailInput = document.getElementById('reg_email').value;
+    const adminIdInput = document.getElementById('reg_admin_id') ? document.getElementById('reg_admin_id').value : '';
     const resultDiv = document.getElementById('register-result');
 
     try {
@@ -140,7 +122,7 @@ async function handleRegister(e) {
                 'Content-Type': 'application/json',
                 'X-CSRF-Token': currentCsrfToken || ''
             },
-            body: JSON.stringify({ username: usernameInput, email: emailInput })
+            body: JSON.stringify({ username: usernameInput, email: emailInput, admin_id: adminIdInput })
         });
 
         const data = await res.json();

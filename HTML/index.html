@@ -50,6 +50,10 @@
                 <label for="reg_email">メールアドレス</label>
                 <input type="email" id="reg_email" required placeholder="example@email.com">
             </div>
+            <div class="form-group">
+                <label for="reg_admin_id">管理者ID（任意・管理者から共有されたID）</label>
+                <input type="text" id="reg_admin_id" placeholder="admin@example.com">
+            </div>
             <button type="submit" style="background-color: #00B894;">仮登録メールを送信</button>
         </form>
         <div id="register-result" class="info-msg" style="margin-top: 15px;"></div>
@@ -81,7 +85,7 @@
         <div class="lantern-grid">
             <div class="lantern-item" id="lantern-card-1">
                 <div class="lantern-title">
-                    <button type="button" class="btn-toggle-icon off" id="btn-toggle-1" onclick="toggleLanternEnable(1)">
+                    <button type="button" class="btn-toggle-icon off" id="btn-toggle-1" style="cursor: default;">
                         <span id="btn-icon-1">🔕</span> <span id="btn-text-1">無効</span>
                     </button>
                     <span>ランタン #1</span>
@@ -94,7 +98,7 @@
             </div>
             <div class="lantern-item" id="lantern-card-2">
                 <div class="lantern-title">
-                    <button type="button" class="btn-toggle-icon off" id="btn-toggle-2" onclick="toggleLanternEnable(2)">
+                    <button type="button" class="btn-toggle-icon off" id="btn-toggle-2" style="cursor: default;">
                         <span id="btn-icon-2">🔕</span> <span id="btn-text-2">無効</span>
                     </button>
                     <span>ランタン #2</span>
@@ -107,7 +111,7 @@
             </div>
             <div class="lantern-item" id="lantern-card-3">
                 <div class="lantern-title">
-                    <button type="button" class="btn-toggle-icon off" id="btn-toggle-3" onclick="toggleLanternEnable(3)">
+                    <button type="button" class="btn-toggle-icon off" id="btn-toggle-3" style="cursor: default;">
                         <span id="btn-icon-3">🔕</span> <span id="btn-text-3">無効</span>
                     </button>
                     <span>ランタン #3</span>
@@ -120,7 +124,7 @@
             </div>
             <div class="lantern-item" id="lantern-card-4">
                 <div class="lantern-title">
-                    <button type="button" class="btn-toggle-icon off" id="btn-toggle-4" onclick="toggleLanternEnable(4)">
+                    <button type="button" class="btn-toggle-icon off" id="btn-toggle-4" style="cursor: default;">
                         <span id="btn-icon-4">🔕</span> <span id="btn-text-4">無効</span>
                     </button>
                     <span>ランタン #4</span>
