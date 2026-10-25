@@ -879,6 +879,24 @@ switch ($action) {
 
         $clientId = $_GET['client_id'] ?? ($_SERVER['HTTP_X_CLIENT_ID'] ?? '');
 
+        // 管理者によって active_sessions から切断（削除）されていないか検証
+        if (!empty($clientId) && strpos($clientId, 'session_') !== 0) {
+            $checkSessionStmt = $pdo->prepare("SELECT COUNT(*) as count FROM active_sessions WHERE user_id = :user_id AND client_id = :client_id");
+            $checkSessionStmt->execute([
+                ':user_id' => $_SESSION['user_id'],
+                ':client_id' => $clientId
+            ]);
+            
+            // active_sessions から消えている場合は強制ログアウト（401）を返す
+            if ((int)$checkSessionStmt->fetch()['count'] === 0) {
+                $_SESSION = [];
+                session_destroy();
+                http_response_code(401);
+                echo json_encode(['success' => false, 'message' => '管理者によってセッションが切断されました']);
+                exit;
+            }
+        }
+
         $stmt = $pdo->prepare("SELECT user_id, username, flag1, flag2, flag3, flag4, enable1, enable2, enable3, enable4, api_key FROM users WHERE user_id = :user_id");
         $stmt->execute([':user_id' => $_SESSION['user_id']]);
         $user = $stmt->fetch();
