@@ -11,9 +11,15 @@
 
     <div class="container" style="max-width: 1400px;">
 
+        <!-- ログイン / 新規仮登録の切り替えナビゲーション -->
+        <div id="admin-auth-nav" class="mb-3 text-center" style="display: none;">
+            <button type="button" class="btn btn-outline-primary active" id="btn-show-login" onclick="switchAuthMode('login')">管理者 ログイン</button>
+            <button type="button" class="btn btn-outline-success ms-2" id="btn-show-register" onclick="switchAuthMode('register')">新規管理者 仮登録</button>
+        </div>
+
         <!-- 管理者 仮登録エリア（初期状態: 非表示） -->
         <div id="admin-register-card" class="card p-4 mb-4" style="display: none;">
-            <h4 class="mb-3">管理者 アカウント初期登録</h4>
+            <h4 class="mb-3">新規管理者 アカウント仮登録</h4>
             <div id="reg-msg"></div>
             <div class="mb-3">
                 <label class="form-label">管理者 氏名</label>
@@ -32,7 +38,7 @@
             <div id="login-msg" class="text-danger mb-2"></div>
             <div class="mb-3">
                 <label class="form-label">ユーザーID / メールアドレス</label>
-                <input type="text" id="admin-id" class="form-control" value="admin">
+                <input type="text" id="admin-id" class="form-control" placeholder="admin@example.com">
             </div>
             <div class="mb-3">
                 <label class="form-label">パスワード</label>
@@ -43,6 +49,14 @@
 
         <!-- 管理者 ダッシュボード（初期状態: 非表示） -->
         <div id="admin-dashboard" style="display: none;">
+            <!-- 管理者ユニークID表示エリア -->
+            <div class="alert alert-info d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <strong>あなたの管理者ID:</strong> <span id="display-admin-unique-id" style="font-family:monospace; font-size:1.1rem; font-weight:bold;">-</span>
+                    <span class="ms-2 text-muted" style="font-size:0.85rem;">（※一般ユーザー登録時にこのIDを指定してもらいます）</span>
+                </div>
+            </div>
+
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div class="d-flex gap-2">
                     <button type="button" class="btn btn-primary" id="downloadAllLogsBtn">全体ログCSV出力</button>
