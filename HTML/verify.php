@@ -42,6 +42,7 @@ $pdo = getDBConnection();
 $token = trim($_GET['token'] ?? '');
 $errorMsg = '';
 $successMsg = '';
+$redirectUrl = 'index.html';
 $isValidToken = false;
 $user = null;
 
@@ -93,6 +94,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isValidToken) {
             ':id' => $user['id']
         ]);
 
+        // 管理者の場合は admin.html、一般ユーザーの場合は index.html を遷移先に設定
+        $redirectUrl = ((int)($user['is_admin'] ?? 0) === 1) ? 'admin.html' : 'index.html';
+
         $successMsg = 'パスワードの設定とAPIキーの更新が完了しました！ログイン画面よりログインしてください。';
         $isValidToken = false;
     }
@@ -117,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isValidToken) {
 
     <?php if (!empty($successMsg)): ?>
         <div class="msg-success"><?= htmlspecialchars($successMsg) ?></div>
-        <a href="index.html" class="btn-link">ログイン画面へ行く</a>
+        <a href="<?= htmlspecialchars($redirectUrl) ?>" class="btn-link">ログイン画面へ行く</a>
     <?php endif; ?>
 
     <?php if ($isValidToken): ?>
